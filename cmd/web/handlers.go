@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/azhumagaliyev/snippetbox/pkg/models"
-	"html/template"
 	"net/http"
 	"strconv"
 )
@@ -13,24 +12,32 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
+	s, err := app.snippets.Latest()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 
-	files := []string{
-		"./ui/html/home.page.tmpl",
-		"./ui/html/base.layout.tmpl",
-		"./ui/html/footer.partial.tmpl",
+	for _, snippet := range s {
+		fmt.Fprintf(w, "%v\n", snippet)
 	}
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.errorLog.Println(err.Error())
-		app.serverError(w, err)
-		return
-	}
-	err = ts.Execute(w, nil)
-	if err != nil {
-		app.errorLog.Println(err.Error())
-		app.serverError(w, err)
-		return
-	}
+	//files := []string{
+	//	"./ui/html/home.page.tmpl",
+	//	"./ui/html/base.layout.tmpl",
+	//	"./ui/html/footer.partial.tmpl",
+	//}
+	//ts, err := template.ParseFiles(files...)
+	//if err != nil {
+	//	app.errorLog.Println(err.Error())
+	//	app.serverError(w, err)
+	//	return
+	//}
+	//err = ts.Execute(w, nil)
+	//if err != nil {
+	//	app.errorLog.Println(err.Error())
+	//	app.serverError(w, err)
+	//	return
+	//}
 }
 
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
